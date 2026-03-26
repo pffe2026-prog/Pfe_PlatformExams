@@ -1,0 +1,62 @@
+{% extends "ui/base.html" %}
+{% load socialaccount %}
+{% block title %}Connexion{% endblock %}
+{% block body %}
+<div class="container d-flex align-items-center" style="min-height:100vh;">
+  <div class="row justify-content-center w-100">
+    <div class="col-12 col-md-7 col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <h1 class="h4 mb-1">Connexion</h1>
+
+          {% if form.errors %}
+            <div class="alert alert-danger small">Identifiants incorrects.</div>
+          {% endif %}
+
+          {% if messages %}
+            {% for m in messages %}
+              <div class="alert alert-{{ m.tags }} small">{{ m }}</div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="post">
+            {% csrf_token %}
+            {% if next %}
+              <input type="hidden" name="next" value="{{ next }}">
+            {% endif %}
+            <div class="mb-3">
+              <label class="form-label">Email ou nom d'utilisateur</label>
+              <input
+                class="form-control"
+                name="username"
+                value="{{ form.username.value|default:'' }}"
+                required
+                autofocus
+              >
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Mot de passe</label>
+              <input class="form-control" type="password" name="password" required>
+            </div>
+            <button class="btn btn-primary w-100">Se connecter</button>
+          </form>
+          <div class="d-flex align-items-center my-3">
+            <hr class="flex-grow-1">
+            <span class="mx-2 text-secondary small">ou</span>
+            <hr class="flex-grow-1">
+          </div>
+          {% if google_oauth_configured %}
+            <a class="btn btn-outline-danger w-100" href="{% provider_login_url 'google' %}">
+              Se connecter avec Google
+            </a>
+          {% else %}
+            <div class="alert alert-secondary small mb-0">
+              Connexion Google non configuree. Ajoutez un SocialApp Google dans l'admin ou renseignez GOOGLE_OAUTH_CLIENT_ID et GOOGLE_OAUTH_CLIENT_SECRET dans le fichier .env.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

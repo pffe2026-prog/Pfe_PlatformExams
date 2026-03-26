@@ -1,0 +1,12 @@
+asgiref==3.11.0
+Django==6.0.1
+djangorestframework==3.16.1
+mysqlclient; platform_system != "Windows"
+PyMySQL; platform_system == "Windows"
+python-dotenv==1.0.1
+requests==2.32.3
+PyJWT==2.8.0
+cryptography==42.0.8
+sqlparse==0.5.5
+tzdata==2025.3
+django-allauth==0.63.6

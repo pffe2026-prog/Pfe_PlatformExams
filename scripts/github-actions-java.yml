@@ -1,0 +1,90 @@
+name: CI Exam Java
+
+on:
+  push:
+    branches:
+      - "student-*"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout submissions repo
+        uses: actions/checkout@v4
+
+      - name: Read metadata
+        id: meta
+        run: |
+          FILE=$(ls -1 solutions/exam_*/**/metadata.json | head -n 1)
+          echo "meta_file=$FILE" >> $GITHUB_OUTPUT
+
+      - name: Show metadata
+        run: cat "${{ steps.meta.outputs.meta_file }}"
+
+      - name: Parse metadata
+        id: parse
+        run: |
+          META="${{ steps.meta.outputs.meta_file }}"
+          TESTS_REPO=$(jq -r '.tests_repo' "$META")
+          TESTS_REF=$(jq -r '.tests_ref' "$META")
+          ENTRY_FILE=$(jq -r '.entry_file' "$META")
+          SOUMISSION_ID=$(jq -r '.soumission_id' "$META")
+          BASE_DIR=$(dirname "$META")
+          echo "tests_repo=$TESTS_REPO" >> $GITHUB_OUTPUT
+          echo "tests_ref=$TESTS_REF" >> $GITHUB_OUTPUT
+          echo "entry_file=$ENTRY_FILE" >> $GITHUB_OUTPUT
+          echo "soumission_id=$SOUMISSION_ID" >> $GITHUB_OUTPUT
+          echo "base_dir=$BASE_DIR" >> $GITHUB_OUTPUT
+
+      - name: Checkout tests repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.parse.outputs.tests_repo }}
+          ref: ${{ steps.parse.outputs.tests_ref }}
+          path: tests
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Prepare project
+        run: |
+          mkdir -p work
+          cp -r tests/* work/
+          cp "${{ steps.parse.outputs.base_dir }}/${{ steps.parse.outputs.entry_file }}" work/src/Main.java
+
+      - name: Run tests (Maven or Gradle)
+        working-directory: work
+        run: |
+          if [ -f "pom.xml" ]; then
+            mvn -q -B test
+          elif [ -f "build.gradle" ] || [ -f "build.gradle.kts" ]; then
+            ./gradlew test
+          else
+            echo "No Maven/Gradle config found in tests repo."
+            exit 1
+          fi
+
+      - name: Post result to webhook
+        if: always()
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+          WEBHOOK_TOKEN: ${{ secrets.WEBHOOK_TOKEN }}
+          SOUMISSION_ID: ${{ steps.parse.outputs.soumission_id }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          if [ "$JOB_STATUS" = "success" ]; then
+            NOTE="20.00"
+            FEEDBACK="Tests reussis"
+            STATUT="CORRIGE"
+          else
+            NOTE="0.00"
+            FEEDBACK="Tests echoues"
+            STATUT="ECHEC"
+          fi
+          curl -sS -X POST "$WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -H "X-API-TOKEN: $WEBHOOK_TOKEN" \
+            -d "{\"soumission\": $SOUMISSION_ID, \"note\": \"$NOTE\", \"feedback\": \"$FEEDBACK\", \"statut_soumission\": \"$STATUT\"}"

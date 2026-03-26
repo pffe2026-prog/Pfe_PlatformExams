@@ -1,0 +1,43 @@
+{% extends "ui/base.html" %}
+
+{% block body %}
+<div class="app-shell d-flex">
+  <aside class="sidebar d-none d-lg-block">
+    <div class="p-3">
+      <div class="fw-bold mb-1">Plateforme d'examens</div>
+      <div class="text-secondary small mb-3">{{ request.user.username }} - {{ request.user.profil.role }}</div>
+
+      <div class="nav nav-pills flex-column gap-1">
+        {% block sidebar %}{% endblock %}
+      </div>
+
+      <hr>
+      <form method="post" action="{% url 'ui:logout' %}">
+        {% csrf_token %}
+        <button class="btn btn-outline-secondary btn-sm w-100" type="submit">Deconnexion</button>
+      </form>
+    </div>
+  </aside>
+
+  <main class="flex-grow-1">
+    <nav class="navbar bg-white border-bottom">
+      <div class="container-fluid">
+        <span class="navbar-brand fw-semibold">{% block header_title %}{% endblock %}</span>
+        <form method="post" action="{% url 'ui:logout' %}" class="d-lg-none">
+          {% csrf_token %}
+          <button class="btn btn-outline-secondary btn-sm" type="submit">Deconnexion</button>
+        </form>
+      </div>
+    </nav>
+
+    <div class="container-fluid p-3 p-lg-4">
+      {% if messages %}
+        {% for m in messages %}
+          <div class="alert alert-{{ m.tags }} small">{{ m }}</div>
+        {% endfor %}
+      {% endif %}
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+</div>
+{% endblock %}

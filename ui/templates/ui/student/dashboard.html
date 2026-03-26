@@ -1,0 +1,76 @@
+{% extends "ui/_shell.html" %}
+
+{% block title %}Etudiant - Tableau de bord{% endblock %}
+{% block header_title %}Espace Etudiant - Tableau de bord{% endblock %}
+
+{% block sidebar %}
+  <a class="nav-link active" href="{% url 'ui:etudiant_dashboard' %}">Tableau de bord</a>
+  <a class="nav-link" href="{% url 'ui:etudiant_examens' %}">Mes examens</a>
+  <a class="nav-link" href="{% url 'ui:etudiant_soumissions' %}">Mes soumissions</a>
+  <a class="nav-link" href="{% url 'ui:etudiant_resultats' %}">Mes resultats</a>
+{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-12 col-md-6 col-xl-3">
+    <div class="card"><div class="card-body"><div class="small-muted">Examens en cours</div><div class="display-6 fw-semibold">{{ nb_en_cours }}</div></div></div>
+  </div>
+  <div class="col-12 col-md-6 col-xl-3">
+    <div class="card"><div class="card-body"><div class="small-muted">Examens a venir</div><div class="display-6 fw-semibold">{{ nb_a_venir }}</div></div></div>
+  </div>
+  <div class="col-12 col-md-6 col-xl-3">
+    <div class="card"><div class="card-body"><div class="small-muted">Mes soumissions</div><div class="display-6 fw-semibold">{{ nb_soumissions }}</div></div></div>
+  </div>
+  <div class="col-12 col-md-6 col-xl-3">
+    <div class="card"><div class="card-body"><div class="small-muted">Mes resultats</div><div class="display-6 fw-semibold">{{ nb_resultats }}</div></div></div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-12 col-lg-6">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="h6 mb-3">Examens en cours</h2>
+        {% if examens_en_cours %}
+          <div class="list-group">
+            {% for ex in examens_en_cours %}
+              <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" href="{% url 'ui:etudiant_examen_detail' ex.id %}">
+                <div>
+                  <div class="fw-semibold">{{ ex.titre }}</div>
+                  <div class="small-muted">Fin: {{ ex.heure_fin }}</div>
+                </div>
+                <span class="badge text-bg-success">EN COURS</span>
+              </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="small-muted">Aucun examen en cours.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-6">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="h6 mb-3">Prochains examens</h2>
+        {% if examens_a_venir %}
+          <div class="list-group">
+            {% for ex in examens_a_venir %}
+              <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" href="{% url 'ui:etudiant_examen_detail' ex.id %}">
+                <div>
+                  <div class="fw-semibold">{{ ex.titre }}</div>
+                  <div class="small-muted">Debut: {{ ex.heure_debut }}</div>
+                </div>
+                <span class="badge text-bg-primary">A VENIR</span>
+              </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="small-muted">Aucun examen a venir.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends "ui/_shell.html" %}
+{% block title %}Enseignant - Examen{% endblock %}
+{% block header_title %}Espace Enseignant - Examen{% endblock %}
+
+{% block sidebar %}
+  <a class="nav-link active" href="{% url 'ui:enseignant_examens' %}">Mes examens</a>
+  <a class="nav-link" href="{% url 'ui:enseignant_soumissions' %}">Soumissions</a>
+  <a class="nav-link" href="{% url 'ui:enseignant_resultats' %}">Resultats</a>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 gap-2">
+  <div>
+    <h1 class="h4 mb-1">{% if mode == "create" %}Creer un examen{% else %}Gerer l'examen{% endif %}</h1>
+    {% if examen %}<div class="small text-secondary">id={{ examen.id }} | cree par {{ examen.cree_par.username }}</div>{% endif %}
+  </div>
+  <a class="btn btn-outline-secondary" href="{% url 'ui:enseignant_examens' %}">Retour</a>
+</div>
+
+<div class="row g-3">
+  <div class="col-12 col-xl-7">
+    <div class="card">
+      <div class="card-body">
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger small">{% for e in form.non_field_errors %}<div>{{ e }}</div>{% endfor %}</div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label">Titre</label>
+            {{ form.titre }}
+            {% for e in form.titre.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            {{ form.description }}
+            {% for e in form.description.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">PDF de l'examen</label>
+            {{ form.pdf_examen }}
+            {% if examen and examen.pdf_examen %}
+              <div class="small text-secondary mt-1">Fichier actuel: {{ examen.pdf_examen.name }}</div>
+            {% endif %}
+            {% for e in form.pdf_examen.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+
+          <div class="row g-2">
+            <div class="col-12 col-md-6">
+              <label class="form-label">Heure debut</label>
+              {{ form.heure_debut }}
+              {% for e in form.heure_debut.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">Heure fin</label>
+              {{ form.heure_fin }}
+              {% for e in form.heure_fin.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <label class="form-label">Statut</label>
+            {{ form.statut }}
+            {% for e in form.statut.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+
+          <hr>
+          <div class="fw-semibold mb-2">Groupes autorises</div>
+          <div class="border rounded p-2 bg-light">
+            {{ form.groupes_autorises }}
+          </div>
+          {% for e in form.groupes_autorises.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+
+          <hr>
+          <div class="mb-3">
+            <label class="form-label">URL tests Git</label>
+            {{ form.url_tests_git }}
+            {% for e in form.url_tests_git.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Hash tests</label>
+            {{ form.hash_tests }}
+            {% for e in form.hash_tests.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+
+          <button class="btn btn-primary" type="submit">{% if mode == "create" %}Creer{% else %}Enregistrer{% endif %}</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-xl-5">
+    {% if examen %}
+      <div class="card mb-3">
+        <div class="card-body">
+          <h2 class="h6 mb-2">Dernieres soumissions</h2>
+          {% if soumissions %}
+            <div class="small">
+              {% for s in soumissions %}
+                <div class="border-bottom py-1">{{ s.etudiant.username }} | {{ s.statut }} | {{ s.soumis_le }}</div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="small text-secondary">Aucune soumission.</div>
+          {% endif %}
+          <a class="btn btn-sm btn-outline-secondary mt-2" href="{% url 'ui:enseignant_soumissions' %}?examen={{ examen.id }}">Voir tout</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <h2 class="h6 mb-2">Derniers resultats</h2>
+          {% if resultats %}
+            <div class="small">
+              {% for r in resultats %}
+                <div class="border-bottom py-1">Soumission #{{ r.soumission.id }} | note {{ r.note }} | {{ r.corrige_le }}</div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="small text-secondary">Aucun resultat.</div>
+          {% endif %}
+          <a class="btn btn-sm btn-outline-secondary mt-2" href="{% url 'ui:enseignant_resultats' %}?examen={{ examen.id }}">Voir tout</a>
+        </div>
+      </div>
+    {% else %}
+      <div class="card">
+        <div class="card-body small text-secondary">Apres creation, tu pourras suivre soumissions et resultats de cet examen.</div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

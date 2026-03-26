@@ -1,0 +1,43 @@
+{% extends "ui/_shell.html" %}
+{% block title %}Enseignant - Soumissions{% endblock %}
+{% block header_title %}Espace Enseignant - Soumissions{% endblock %}
+
+{% block sidebar %}
+  <a class="nav-link" href="{% url 'ui:enseignant_examens' %}">Mes examens</a>
+  <a class="nav-link active" href="{% url 'ui:enseignant_soumissions' %}">Soumissions</a>
+  <a class="nav-link" href="{% url 'ui:enseignant_resultats' %}">Resultats</a>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h1 class="h4 mb-0">Soumissions de mes examens</h1>
+  <form class="d-flex gap-2" method="get">
+    <input class="form-control" style="max-width:200px;" name="examen" value="{{ examen_id }}" maxlength="20" inputmode="numeric" placeholder="id examen...">
+    <button class="btn btn-outline-secondary">Filtrer</button>
+  </form>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    {% if soumissions %}
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead><tr><th>Examen</th><th>Etudiant</th><th>Soumis le</th><th>Statut</th></tr></thead>
+          <tbody>
+            {% for s in soumissions %}
+              <tr>
+                <td class="fw-semibold">{{ s.examen.titre }}</td>
+                <td>{{ s.etudiant.username }}</td>
+                <td class="small text-secondary">{{ s.soumis_le }}</td>
+                <td><span class="badge text-bg-secondary">{{ s.statut }}</span></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="small text-secondary">Aucune soumission.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
