@@ -1,0 +1,13 @@
+{
+  "name": "pfe-platform-exams",
+  "private": true,
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:demo": "powershell -ExecutionPolicy Bypass -File scripts/run_playwright_demo.ps1",
+    "playwright:install": "playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.58.2"
+  }
+}

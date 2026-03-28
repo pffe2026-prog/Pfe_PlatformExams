@@ -248,6 +248,13 @@ def _upsert_file(owner, repo, path, content, branch, message, headers):
 
 
 def _push_solution_to_github(examen, user, soumission_id, code_source):
+    if getattr(settings, "PLAYWRIGHT_DEMO_MODE", False):
+        return (
+            True,
+            "https://github.com/demo/playwright-demo-solutions",
+            f"playwright-demo-{soumission_id}",
+        )
+
     headers = _github_headers()
     if not headers:
         return False, "Configuration GitHub manquante (GITHUB_TOKEN).", ""

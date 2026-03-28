@@ -50,5 +50,31 @@ Le fichier `.env.example` contient les variables principales:
 python manage.py test
 ```
 
+## Tests E2E avec Playwright
+```powershell
+npm install
+npx playwright install chromium
+npm run test:e2e
+```
+
+Les tests Playwright demarrent Django automatiquement, appliquent les migrations locales, creent des comptes de demo et executent:
+- un scenario enseignant: connexion + creation d examen en brouillon
+- un scenario etudiant: connexion + consultation du tableau de bord, d un examen en cours et des resultats
+
+Pour la soutenance, utilisez le scenario complet et ralenti:
+```powershell
+npm run test:e2e:demo
+```
+
+Ce scenario montre dans le meme enchainement:
+- enseignant: creation d un examen publie
+- etudiant: ouverture de l examen, soumission et consultation du resultat final
+
+Comptes de demo utilises par Playwright:
+- username: `demo_teacher`
+- password: `DemoPass123!`
+- username: `demo_student`
+- password: `DemoPass123!`
+
 ## Donnees de demonstration
 Le fichier `fixtures/demo.json` peut etre utilise pour charger un jeu de donnees de demo.

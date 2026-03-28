@@ -21,7 +21,9 @@ except ImportError:
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 if load_dotenv:
-    load_dotenv(BASE_DIR / ".env")
+    # Prefer the repository-local .env for local development, even if the
+    # machine already exports variables like DEBUG=release.
+    load_dotenv(BASE_DIR / ".env", override=True)
 
 
 def env_bool(name, default=False):
@@ -231,6 +233,7 @@ GITHUB_BASE_BRANCH = os.environ.get("GITHUB_BASE_BRANCH", "main")
 GITHUB_SOLUTIONS_PATH = os.environ.get("GITHUB_SOLUTIONS_PATH", "solutions")
 OAUTH_EMAIL_AUTOLOGIN_SECRET = os.environ.get("OAUTH_EMAIL_AUTOLOGIN_SECRET", "")
 OAUTH_EMAIL_MAX_AGE_SECONDS = env_int("OAUTH_EMAIL_MAX_AGE_SECONDS", 300)
+PLAYWRIGHT_DEMO_MODE = env_bool("PLAYWRIGHT_DEMO_MODE", False)
 
 LOGIN_URL = "/connexion/"
 LOGIN_REDIRECT_URL = "/"   # on passe par home() qui redirige selon le rôle
